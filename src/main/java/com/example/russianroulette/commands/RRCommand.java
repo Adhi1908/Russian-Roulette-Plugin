@@ -25,10 +25,10 @@ public class RRCommand implements CommandExecutor, TabCompleter {
     private final GameManager gameManager;
 
     private static final List<String> SUBCOMMANDS = Arrays.asList(
-            "start", "join", "leave", "forceend", "reload");
+            "start", "join", "leave", "forceend", "reload", "setseat", "setcenter");
 
     private static final List<String> ADMIN_SUBCOMMANDS = Arrays.asList(
-            "forceend", "reload");
+            "forceend", "reload", "setseat", "setcenter");
 
     public RRCommand(RussianRoulettePlugin plugin) {
         this.plugin = plugin;
@@ -60,6 +60,12 @@ public class RRCommand implements CommandExecutor, TabCompleter {
                 break;
             case "reload":
                 handleReload(sender);
+                break;
+            case "setseat":
+                handleSetSeat(sender, args);
+                break;
+            case "setcenter":
+                handleSetCenter(sender);
                 break;
             default:
                 sender.sendMessage(config.getMessage("unknownCommand"));
@@ -223,7 +229,9 @@ public class RRCommand implements CommandExecutor, TabCompleter {
      * Send help message to sender.
      */
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage(config.colorize("&c&l═══ Russian Roulette ═══"));
+        sender.sendMessage(config.getMessage("helpHeader"));
+        sender.sendMessage(config.getMessage("helpBranding"));
+        sender.sendMessage("");
         sender.sendMessage(config.colorize("&e/rr start &7- Start a new game"));
         sender.sendMessage(config.colorize("&e/rr join &7- Join a waiting game"));
         sender.sendMessage(config.colorize("&e/rr leave &7- Leave current game"));
@@ -231,7 +239,74 @@ public class RRCommand implements CommandExecutor, TabCompleter {
         if (sender.hasPermission("russianroulette.admin")) {
             sender.sendMessage(config.colorize("&e/rr forceend &7- Force end all games"));
             sender.sendMessage(config.colorize("&e/rr reload &7- Reload configuration"));
+            sender.sendMessage(config.colorize("&e/rr setseat <1-6> &7- Set seat position"));
+            sender.sendMessage(config.colorize("&e/rr setcenter &7- Set table center"));
         }
+    }
+
+    /**
+     * Handle /rr setseat <number> command.
+     */
+    private void handleSetSeat(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(config.getMessage("playerOnly"));
+            return;
+        }
+
+        Player player = (Player) sender;
+
+        if (!player.hasPermission("russianroulette.admin")) {
+            player.sendMessage(config.getMessage("noPermission"));
+            return;
+        }
+
+        if (args.length < 2) {
+            player.sendMessage(config.colorize("&cUsage: /rr setseat <1-6>"));
+            return;
+        }
+
+        int seatNumber;
+        try {
+            seatNumber = Integer.parseInt(args[1]);
+            if (seatNumber < 1 || seatNumber > 6) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+            player.sendMessage(config.colorize("&cInvalid seat number! Use 1-6."));
+            return;
+        }
+
+        // Save the seat location
+        config.setSeatLocation(seatNumber, player.getLocation());
+        player.sendMessage(config.colorize("&aSeat " + seatNumber + " set to your current location!"));
+        player.sendMessage(config.colorize("&7X: " + String.format("%.1f", player.getLocation().getX()) +
+                ", Y: " + String.format("%.1f", player.getLocation().getY()) +
+                ", Z: " + String.format("%.1f", player.getLocation().getZ()) +
+                ", Yaw: " + String.format("%.0f", player.getLocation().getYaw())));
+    }
+
+    /**
+     * Handle /rr setcenter command.
+     */
+    private void handleSetCenter(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(config.getMessage("playerOnly"));
+            return;
+        }
+
+        Player player = (Player) sender;
+
+        if (!player.hasPermission("russianroulette.admin")) {
+            player.sendMessage(config.getMessage("noPermission"));
+            return;
+        }
+
+        // Save the center location
+        config.setCenterLocation(player.getLocation());
+        player.sendMessage(config.colorize("&aTable center set to your current location!"));
+        player.sendMessage(config.colorize("&7X: " + String.format("%.1f", player.getLocation().getX()) +
+                ", Y: " + String.format("%.1f", player.getLocation().getY()) +
+                ", Z: " + String.format("%.1f", player.getLocation().getZ())));
     }
 
     @Override
@@ -247,6 +322,18 @@ public class RRCommand implements CommandExecutor, TabCompleter {
                         continue;
                     }
                     completions.add(sub);
+                }
+            }
+            return completions;
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("setseat")) {
+            List<String> seatNumbers = Arrays.asList("1", "2", "3", "4", "5", "6");
+            String input = args[1];
+            List<String> completions = new ArrayList<>();
+            for (String num : seatNumbers) {
+                if (num.startsWith(input)) {
+                    completions.add(num);
                 }
             }
             return completions;

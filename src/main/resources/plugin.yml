@@ -2,8 +2,9 @@ name: RussianRoulette
 version: ${project.version}
 main: com.example.russianroulette.RussianRoulettePlugin
 api-version: '1.20'
-description: A thrilling Russian Roulette minigame plugin
-author: Example
+description: A thrilling Russian Roulette minigame plugin by MBTH STUDIOS
+author: MBTH STUDIOS
+website: https://github.com/Adhi1908/Russian-Roulette-Plugin
 softdepend:
   - Vault
 

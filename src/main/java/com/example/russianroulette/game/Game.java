@@ -248,7 +248,7 @@ public class Game {
         double centerX = config.getArenaCenterX();
         double centerY = config.getArenaCenterY();
         double centerZ = config.getArenaCenterZ();
-        double radius = config.getCircleRadius() + 2; // Camera slightly further out
+        double radius = 5; // Camera orbit radius around table
 
         // Store original game modes and set to spectator for cinematic
         Map<UUID, org.bukkit.GameMode> originalModes = new HashMap<>();
@@ -688,39 +688,34 @@ public class Game {
     }
 
     /**
-     * Teleport all players to the arena in a circle.
+     * Teleport all players to their assigned seats.
      */
     private void teleportPlayersToArena() {
         World world = Bukkit.getWorld(config.getArenaWorld());
         if (world == null)
             return;
 
-        double centerX = config.getArenaCenterX();
-        double centerY = config.getArenaCenterY();
-        double centerZ = config.getArenaCenterZ();
-        double radius = config.getCircleRadius();
+        java.util.List<double[]> seats = config.getSeatLocations();
+        if (seats.isEmpty()) {
+            plugin.getLogger().warning("No seat locations configured!");
+            return;
+        }
 
-        int playerCount = players.size();
-        double angleStep = (2 * Math.PI) / playerCount;
-
-        int index = 0;
+        int seatIndex = 0;
         for (UUID playerId : players.keySet()) {
             Player player = Bukkit.getPlayer(playerId);
-            if (player != null) {
-                double angle = angleStep * index;
-                double x = centerX + radius * Math.cos(angle);
-                double z = centerZ + radius * Math.sin(angle);
-
-                Location loc = new Location(world, x, centerY, z);
-                // Make player face center
-                loc.setYaw((float) Math.toDegrees(Math.atan2(centerZ - z, centerX - x)) - 90);
+            if (player != null && seatIndex < seats.size()) {
+                double[] seatData = seats.get(seatIndex);
+                Location loc = new Location(world, seatData[0], seatData[1], seatData[2]);
+                loc.setYaw((float) seatData[3]);
+                loc.setPitch(0);
 
                 player.teleport(loc);
 
                 // Seat the player in an invisible chair
                 seatPlayer(player, loc);
 
-                index++;
+                seatIndex++;
             }
         }
     }

@@ -19,6 +19,10 @@ playerOnly: "&cThis command can only be used by players!"
 reloadSuccess: "&aConfiguration reloaded successfully!"
 unknownCommand: "&cUnknown subcommand. Use: /rr <start|join|leave|forceend|reload>"
 
+# Help Menu (fully customizable)
+helpHeader: "&c&l═══ Russian Roulette ═══"
+helpBranding: "&8by &cMBTH STUDIOS"
+
 # Game Messages
 gameCreated: "&aGame created! Players can now join with &e/rr join"
 gameStarting: "&e&lGame starting in %time% seconds..."

@@ -138,8 +138,46 @@ public class ConfigManager {
         return config.getDouble("arena.center.z", 0);
     }
 
-    public double getCircleRadius() {
-        return config.getDouble("arena.circleRadius", 5);
+    /**
+     * Get list of seat locations from config.
+     * Returns locations for seat1 through seat6.
+     */
+    public java.util.List<double[]> getSeatLocations() {
+        java.util.List<double[]> seats = new java.util.ArrayList<>();
+        for (int i = 1; i <= 6; i++) {
+            String path = "arena.seats.seat" + i;
+            if (config.contains(path + ".x")) {
+                double x = config.getDouble(path + ".x", 0);
+                double y = config.getDouble(path + ".y", 64);
+                double z = config.getDouble(path + ".z", 0);
+                float yaw = (float) config.getDouble(path + ".yaw", 0);
+                seats.add(new double[] { x, y, z, yaw });
+            }
+        }
+        return seats;
+    }
+
+    /**
+     * Set a seat location and save to config.
+     */
+    public void setSeatLocation(int seatNumber, org.bukkit.Location location) {
+        String path = "arena.seats.seat" + seatNumber;
+        config.set(path + ".x", location.getX());
+        config.set(path + ".y", location.getY());
+        config.set(path + ".z", location.getZ());
+        config.set(path + ".yaw", location.getYaw());
+        plugin.saveConfig();
+    }
+
+    /**
+     * Set the table center location and save to config.
+     */
+    public void setCenterLocation(org.bukkit.Location location) {
+        config.set("arena.center.x", location.getX());
+        config.set("arena.center.y", location.getY());
+        config.set("arena.center.z", location.getZ());
+        config.set("arena.world", location.getWorld().getName());
+        plugin.saveConfig();
     }
 
     // ==================== BETTING SETTINGS ====================

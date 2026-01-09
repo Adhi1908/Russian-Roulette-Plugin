@@ -25,13 +25,46 @@ arena:
   world: "world"
   # Whether to teleport players to arena (if false, plays where started)
   teleportToArena: true
-  # Arena center location (only used if teleportToArena is true)
+  # Table center (for cinematic camera)
   center:
     x: 0
     y: 64
     z: 0
-  # Radius for player placement circle
-  circleRadius: 5
+  
+  # Individual seat coordinates (define exact positions for each chair)
+  # Players will be assigned to seats in order (seat1, seat2, etc.)
+  # Yaw = direction player faces (0=south, 90=west, 180=north, 270=east)
+  seats:
+    seat1:
+      x: 2
+      y: 64
+      z: 0
+      yaw: 270  # Face west (toward center)
+    seat2:
+      x: 1
+      y: 64
+      z: -2
+      yaw: 180  # Face north
+    seat3:
+      x: -1
+      y: 64
+      z: -2
+      yaw: 180  # Face north
+    seat4:
+      x: -2
+      y: 64
+      z: 0
+      yaw: 90   # Face east (toward center)
+    seat5:
+      x: -1
+      y: 64
+      z: 2
+      yaw: 0    # Face south
+    seat6:
+      x: 1
+      y: 64
+      z: 2
+      yaw: 0    # Face south
 
 # Betting System Settings
 betting:
