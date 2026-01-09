@@ -7,7 +7,7 @@ game:
   # Minimum players required to start
   minPlayers: 2
   # Maximum players allowed (set to -1 for unlimited)
-  maxPlayers: 10
+  maxPlayers: 6
   # Time in seconds for each player's turn
   turnTime: 10
   # Game mode: CLASSIC (1 bullet), HARDCORE (2 bullets), INSANE (3 bullets)
@@ -24,7 +24,7 @@ arena:
   # World name for the arena
   world: "world"
   # Whether to teleport players to arena (if false, plays where started)
-  teleportToArena: false
+  teleportToArena: true
   # Arena center location (only used if teleportToArena is true)
   center:
     x: 0

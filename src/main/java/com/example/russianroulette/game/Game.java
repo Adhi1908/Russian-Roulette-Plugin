@@ -2,10 +2,10 @@ package com.example.russianroulette.game;
 
 import com.example.russianroulette.RussianRoulettePlugin;
 import com.example.russianroulette.config.ConfigManager;
-import com.example.russianroulette.gui.RevolverGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -39,6 +39,12 @@ public class Game {
 
     private final boolean reshuffleAfterShot;
 
+    // Chair entities for seating players
+    private final Map<UUID, ArmorStand> seatEntities;
+
+    // Cinematic intro task
+    private BukkitTask cinematicTask;
+
     public Game(RussianRoulettePlugin plugin) {
         this.plugin = plugin;
         this.config = plugin.getConfigManager();
@@ -49,6 +55,7 @@ public class Game {
         this.turnOrder = new ArrayList<>();
         this.currentTurnIndex = 0;
         this.reshuffleAfterShot = config.isReshuffleAfterShot();
+        this.seatEntities = new HashMap<>();
     }
 
     /**
@@ -218,7 +225,114 @@ public class Game {
         // Setup scoreboards
         updateScoreboards();
 
-        // Start first turn
+        // Play cinematic intro, then start first turn
+        playCinematicIntro();
+    }
+
+    /**
+     * Play cinematic camera intro showing all players around the table.
+     */
+    private void playCinematicIntro() {
+        if (!config.isTeleportToArena() || players.size() < 2) {
+            // Skip cinematic if not in arena or too few players
+            startTurn();
+            return;
+        }
+
+        World world = Bukkit.getWorld(config.getArenaWorld());
+        if (world == null) {
+            startTurn();
+            return;
+        }
+
+        double centerX = config.getArenaCenterX();
+        double centerY = config.getArenaCenterY();
+        double centerZ = config.getArenaCenterZ();
+        double radius = config.getCircleRadius() + 2; // Camera slightly further out
+
+        // Store original game modes and set to spectator for cinematic
+        Map<UUID, org.bukkit.GameMode> originalModes = new HashMap<>();
+        List<UUID> playerList = new ArrayList<>(players.keySet());
+
+        for (UUID playerId : playerList) {
+            Player player = Bukkit.getPlayer(playerId);
+            if (player != null) {
+                originalModes.put(playerId, player.getGameMode());
+                player.setGameMode(org.bukkit.GameMode.SPECTATOR);
+            }
+        }
+
+        // Cinematic camera rotation
+        final int[] step = { 0 };
+        final int totalSteps = playerList.size() * 20 + 40; // 1 second per player + 2 sec intro/outro
+        final int stepsPerPlayer = 20;
+
+        cinematicTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (step[0] >= totalSteps || state != GameState.IN_PROGRESS) {
+                    // End cinematic
+                    cancel();
+                    endCinematic(originalModes);
+                    return;
+                }
+
+                // Calculate camera position orbiting around center
+                double angle = (2 * Math.PI * step[0]) / totalSteps;
+                double camX = centerX + radius * Math.cos(angle);
+                double camZ = centerZ + radius * Math.sin(angle);
+                double camY = centerY + 2; // Slightly above table level
+
+                Location camLoc = new Location(world, camX, camY, camZ);
+                // Face the center of the table
+                camLoc.setYaw((float) Math.toDegrees(Math.atan2(centerZ - camZ, centerX - camX)) - 90);
+                camLoc.setPitch(15); // Look slightly down at table
+
+                // Move all players' cameras
+                for (UUID playerId : playerList) {
+                    Player player = Bukkit.getPlayer(playerId);
+                    if (player != null && player.isOnline()) {
+                        player.teleport(camLoc);
+                    }
+                }
+
+                // Show player introductions
+                int playerIndex = (step[0] - 20) / stepsPerPlayer;
+                int stepInPlayer = (step[0] - 20) % stepsPerPlayer;
+
+                if (playerIndex >= 0 && playerIndex < playerList.size() && stepInPlayer == 0) {
+                    Player featured = Bukkit.getPlayer(playerList.get(playerIndex));
+                    if (featured != null) {
+                        broadcastMessage(config.getMessage("playerIntro")
+                                .replace("%player%", featured.getName())
+                                .replace("%number%", String.valueOf(playerIndex + 1)));
+                    }
+                }
+
+                step[0]++;
+            }
+        }.runTaskTimer(plugin, 20L, 1L); // Start after 1 second, run every tick
+    }
+
+    /**
+     * End cinematic and restore players to their seats.
+     */
+    private void endCinematic(Map<UUID, org.bukkit.GameMode> originalModes) {
+        // Restore game modes and teleport back to seats
+        for (UUID playerId : players.keySet()) {
+            Player player = Bukkit.getPlayer(playerId);
+            if (player != null && player.isOnline()) {
+                // Restore game mode
+                org.bukkit.GameMode original = originalModes.getOrDefault(playerId, org.bukkit.GameMode.SURVIVAL);
+                player.setGameMode(original);
+            }
+        }
+
+        // Re-teleport and re-seat players
+        teleportPlayersToArena();
+
+        // Now start the actual game
+        broadcastMessage(config.getMessage("cinematicEnd"));
         startTurn();
     }
 
@@ -252,8 +366,8 @@ public class Game {
         // Play turn start sound
         playSound("turnStart", player);
 
-        // Open GUI
-        RevolverGUI.openGUI(player, this);
+        // Tell player to right-click the gun (no auto GUI)
+        player.sendMessage(config.getMessage("rightClickToShoot"));
 
         // Broadcast to others
         for (UUID otherId : players.keySet()) {
@@ -541,6 +655,8 @@ public class Game {
                 // Teleport back
                 PlayerData data = players.get(playerId);
                 if (config.isTeleportToArena() && data != null) {
+                    // Unseat player first
+                    unseatPlayer(player);
                     player.teleport(data.getOriginalLocation());
                 }
 
@@ -548,6 +664,9 @@ public class Game {
                 plugin.getScoreboardManager().removeScoreboard(player);
             }
         }
+
+        // Clean up all seat entities
+        cleanupSeats();
 
         players.clear();
         turnOrder.clear();
@@ -597,9 +716,60 @@ public class Game {
                 loc.setYaw((float) Math.toDegrees(Math.atan2(centerZ - z, centerX - x)) - 90);
 
                 player.teleport(loc);
+
+                // Seat the player in an invisible chair
+                seatPlayer(player, loc);
+
                 index++;
             }
         }
+    }
+
+    /**
+     * Seat a player in an invisible armor stand (chair).
+     */
+    private void seatPlayer(Player player, Location location) {
+        // Create invisible armor stand as seat
+        ArmorStand seat = location.getWorld().spawn(
+                location.clone().subtract(0, 0.7, 0), // Lower so player appears seated
+                ArmorStand.class,
+                armorStand -> {
+                    armorStand.setVisible(false);
+                    armorStand.setGravity(false);
+                    armorStand.setInvulnerable(true);
+                    armorStand.setSmall(true);
+                    armorStand.setMarker(true);
+                    armorStand.setCustomName("RR_Seat_" + player.getUniqueId());
+                    armorStand.setCustomNameVisible(false);
+                });
+
+        // Make player sit on it
+        seat.addPassenger(player);
+        seatEntities.put(player.getUniqueId(), seat);
+    }
+
+    /**
+     * Unseat a player and remove their chair entity.
+     */
+    private void unseatPlayer(Player player) {
+        ArmorStand seat = seatEntities.remove(player.getUniqueId());
+        if (seat != null && !seat.isDead()) {
+            seat.eject();
+            seat.remove();
+        }
+    }
+
+    /**
+     * Clean up all seat entities.
+     */
+    private void cleanupSeats() {
+        for (ArmorStand seat : seatEntities.values()) {
+            if (seat != null && !seat.isDead()) {
+                seat.eject();
+                seat.remove();
+            }
+        }
+        seatEntities.clear();
     }
 
     /**
