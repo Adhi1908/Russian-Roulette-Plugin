@@ -1,0 +1,190 @@
+# ============================================
+# Russian Roulette Plugin Configuration
+# ============================================
+
+# Game Settings
+game:
+  # Minimum players required to start
+  minPlayers: 2
+  # Maximum players allowed (set to -1 for unlimited)
+  maxPlayers: 10
+  # Time in seconds for each player's turn
+  turnTime: 10
+  # Game mode: CLASSIC (1 bullet), HARDCORE (2 bullets), INSANE (3 bullets)
+  gameMode: CLASSIC
+  # Reshuffle chamber after each shot
+  reshuffleAfterShot: false
+  # Countdown time before game starts (in seconds)
+  startCountdown: 5
+  # Allow multiple games simultaneously
+  allowMultipleGames: false
+
+# Arena Settings
+arena:
+  # World name for the arena
+  world: "world"
+  # Whether to teleport players to arena (if false, plays where started)
+  teleportToArena: false
+  # Arena center location (only used if teleportToArena is true)
+  center:
+    x: 0
+    y: 64
+    z: 0
+  # Radius for player placement circle
+  circleRadius: 5
+
+# Betting System Settings
+betting:
+  # Enable betting (players must bet to join)
+  enabled: true
+  # Bet type: MONEY or ITEMS
+  type: MONEY
+  # Money bet amount (requires Vault)
+  moneyAmount: 1000
+  
+  # === ITEM BETTING CONFIGURATION (when type is ITEMS) ===
+  # Minimum total value of items required to bet
+  minItemValue: 100
+  
+  # Allowed items players can bet (with their values for calculating total bet)
+  # Players can bet ANY of these items - as long as total value >= minItemValue
+  allowedItems:
+    # Diamonds
+    - material: DIAMOND
+      valuePerItem: 50
+    - material: DIAMOND_BLOCK
+      valuePerItem: 450
+    
+    # Gold
+    - material: GOLD_INGOT
+      valuePerItem: 10
+    - material: GOLD_BLOCK
+      valuePerItem: 90
+    
+    # Golden Apples
+    - material: GOLDEN_APPLE
+      valuePerItem: 100
+    - material: ENCHANTED_GOLDEN_APPLE
+      valuePerItem: 1000
+    
+    # Netherite
+    - material: NETHERITE_INGOT
+      valuePerItem: 500
+    - material: NETHERITE_BLOCK
+      valuePerItem: 4500
+    - material: NETHERITE_SCRAP
+      valuePerItem: 125
+    - material: ANCIENT_DEBRIS
+      valuePerItem: 100
+    
+    # Netherite Tools & Armor
+    - material: NETHERITE_SWORD
+      valuePerItem: 750
+    - material: NETHERITE_PICKAXE
+      valuePerItem: 750
+    - material: NETHERITE_AXE
+      valuePerItem: 750
+    - material: NETHERITE_SHOVEL
+      valuePerItem: 550
+    - material: NETHERITE_HOE
+      valuePerItem: 550
+    - material: NETHERITE_HELMET
+      valuePerItem: 1000
+    - material: NETHERITE_CHESTPLATE
+      valuePerItem: 1500
+    - material: NETHERITE_LEGGINGS
+      valuePerItem: 1250
+    - material: NETHERITE_BOOTS
+      valuePerItem: 1000
+    
+    # Emeralds
+    - material: EMERALD
+      valuePerItem: 25
+    - material: EMERALD_BLOCK
+      valuePerItem: 225
+    
+    # Other Valuables
+    - material: IRON_INGOT
+      valuePerItem: 5
+    - material: IRON_BLOCK
+      valuePerItem: 45
+    - material: LAPIS_LAZULI
+      valuePerItem: 3
+    - material: TOTEM_OF_UNDYING
+      valuePerItem: 500
+    - material: ELYTRA
+      valuePerItem: 2000
+    - material: NETHER_STAR
+      valuePerItem: 1500
+  
+  # House cut percentage (0-100, server takes this % of the pot)
+  houseCut: 0
+  # Refund bets if game is cancelled/force-ended
+  refundOnCancel: true
+
+# Sound Settings
+sounds:
+  # Sound when trigger is pulled and chamber is empty
+  triggerEmpty:
+    sound: BLOCK_LEVER_CLICK
+    volume: 1.0
+    pitch: 1.0
+  # Sound when trigger is pulled and bullet fires
+  triggerFire:
+    sound: ENTITY_GENERIC_EXPLODE
+    volume: 1.0
+    pitch: 0.5
+  # Sound when game starts
+  gameStart:
+    sound: ENTITY_ENDER_DRAGON_GROWL
+    volume: 0.5
+    pitch: 1.5
+  # Sound when player's turn starts
+  turnStart:
+    sound: BLOCK_NOTE_BLOCK_PLING
+    volume: 1.0
+    pitch: 1.0
+  # Timer tick sound
+  timerTick:
+    sound: BLOCK_NOTE_BLOCK_HAT
+    volume: 0.5
+    pitch: 1.0
+
+# Visual Effects
+effects:
+  # Show blood particles on death
+  bloodParticles: true
+  # Number of blood particles
+  bloodParticleCount: 50
+  # Show smoke particles on shot
+  smokeParticles: true
+  # Apply slow-motion effect on death (slowness + blindness)
+  slowMotionDeath: true
+  # Duration of slow-motion in ticks (20 ticks = 1 second)
+  slowMotionDuration: 40
+  # Show "BANG!" title on death
+  showBangTitle: true
+
+# Revolver Item Settings
+revolverItem:
+  # Material for the revolver item
+  material: IRON_HORSE_ARMOR
+  # Display name
+  name: "&c&l⚡ REVOLVER ⚡"
+  # Lore
+  lore:
+    - "&7Right-click to pull the trigger..."
+    - "&c&lWill you survive?"
+    - ""
+    - "&eChambers: 6"
+
+# Scoreboard Settings
+scoreboard:
+  # Enable scoreboard display during game
+  enabled: true
+  # Scoreboard title
+  title: "&c&l☠ RUSSIAN ROULETTE ☠"
+
+# Message Settings
+messages:
+  prefix: "&8[&c&lRR&8] &r"

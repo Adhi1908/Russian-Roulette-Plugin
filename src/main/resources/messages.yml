@@ -1,0 +1,91 @@
+# ============================================
+# Russian Roulette Messages Configuration
+# ============================================
+# Placeholders:
+#   %player% - Player name
+#   %players% - Number of players
+#   %min% - Minimum players
+#   %max% - Maximum players
+#   %turn% - Current turn player
+#   %alive% - Players alive
+#   %bullets% - Bullets remaining
+#   %time% - Time remaining
+#   %winner% - Winner name
+#   %money% - Money reward
+
+# General Messages
+noPermission: "&cYou don't have permission to do that!"
+playerOnly: "&cThis command can only be used by players!"
+reloadSuccess: "&aConfiguration reloaded successfully!"
+unknownCommand: "&cUnknown subcommand. Use: /rr <start|join|leave|forceend|reload>"
+
+# Game Messages
+gameCreated: "&aGame created! Players can now join with &e/rr join"
+gameStarting: "&e&lGame starting in %time% seconds..."
+gameStarted: "&c&l☠ THE GAME HAS BEGUN! ☠"
+gameEnded: "&7The game has ended."
+gameForceEnded: "&c&lGame was force ended by an admin!"
+noActiveGame: "&cThere is no active game to join!"
+gameAlreadyExists: "&cA game is already in progress!"
+gameAlreadyStarted: "&cThe game has already started!"
+notEnoughPlayers: "&cNeed at least %min% players to start! (Current: %players%)"
+maxPlayersReached: "&cThe game is full! (%max% players max)"
+
+# Player Messages
+playerJoined: "&a%player% has joined the game! &7(%players%/%max%)"
+playerLeft: "&c%player% has left the game! &7(%players%/%max%)"
+playerDied: "&c&l☠ %player% WAS SHOT! ☠"
+playerSurvived: "&a%player% survived... &7*click*"
+alreadyInGame: "&cYou are already in a game!"
+notInGame: "&cYou are not in a game!"
+cannotLeaveDuringTurn: "&c&lYou cannot leave during your turn!"
+notYourTurn: "&cIt's not your turn!"
+disconnectedDeath: "&c%player% disconnected and was eliminated!"
+
+# Turn Messages
+yourTurn: "&e&l⚠ IT'S YOUR TURN! ⚠"
+yourTurnSubtitle: "&7Right-click the revolver or click the GUI..."
+playerTurn: "&eIt's &c%turn%&e's turn!"
+turnTimer: "&7Time remaining: &e%time%s"
+autoTriggerPull: "&c%player% ran out of time! Auto-pulling trigger..."
+
+# Winner Messages
+youWin: "&a&l✦ CONGRATULATIONS! YOU WON! ✦"
+winnerAnnouncement: "&6&l✦ %winner% IS THE WINNER! ✦"
+winningsReceived: "&aYou won the pot of &e$%amount%&a!"
+itemsWon: "&aYou won the item pot!"
+
+# Betting Messages
+betTaken: "&aYour bet of &e$%amount% &ahas been placed!"
+betItemsTaken: "&aYour item bet (value: &e%value%&a) has been placed!"
+insufficientFunds: "&cYou don't have enough money! Need: &e$%amount%"
+insufficientItems: "&cYou don't have enough allowed items! Your value: &e%value% &c(need: &e%required%&c)"
+betsRefunded: "&aYour bet of &e$%amount% &ahas been refunded!"
+itemsRefunded: "&aYour bet items have been refunded!"
+
+# Title Messages
+bangTitle: "&c&lBANG!"
+bangSubtitle: "&7You're dead..."
+survivedTitle: "&a&l*CLICK*"
+survivedSubtitle: "&7You survived... this time."
+winTitle: "&6&l✦ WINNER! ✦"
+winSubtitle: "&eYou are the last one standing!"
+yourTurnTitle: "&e&lYOUR TURN"
+yourTurnTitleSubtitle: "&cPull the trigger..."
+
+# GUI Messages
+guiTitle: "&c&l☠ Pull The Trigger ☠"
+pullTriggerButton: "&c&l⚡ PULL TRIGGER ⚡"
+pullTriggerLore:
+  - "&7Click to pull the trigger..."
+  - ""
+  - "&cWill you survive?"
+  - "&7Chambers remaining: &e%chambers%"
+  - "&7Bullets: &c%bullets%"
+
+# Scoreboard Lines
+scoreboardPlayers: "&fPlayers Alive: &a%alive%"
+scoreboardBullets: "&fBullets Left: &c%bullets%"
+scoreboardTurn: "&fCurrent Turn: &e%turn%"
+scoreboardPhase: "&fPhase: &b%phase%"
+scoreboardTimer: "&fTime Left: &e%time%s"

@@ -1,0 +1,33 @@
+name: RussianRoulette
+version: ${project.version}
+main: com.example.russianroulette.RussianRoulettePlugin
+api-version: '1.20'
+description: A thrilling Russian Roulette minigame plugin
+author: Example
+softdepend:
+  - Vault
+
+commands:
+  rr:
+    description: Russian Roulette main command
+    usage: /<command> <start|join|leave|forceend|reload>
+    aliases:
+      - russianroulette
+
+permissions:
+  russianroulette.play:
+    description: Allows playing Russian Roulette games
+    default: true
+  russianroulette.start:
+    description: Allows starting Russian Roulette games
+    default: op
+  russianroulette.admin:
+    description: Allows admin commands (forceend, reload)
+    default: op
+  russianroulette.*:
+    description: All Russian Roulette permissions
+    default: op
+    children:
+      russianroulette.play: true
+      russianroulette.start: true
+      russianroulette.admin: true
